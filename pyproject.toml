@@ -1,0 +1,11 @@
+[project]
+name = "rlgym"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gymnasium[box2d]>=1.2.0",
+    "pygame>=2.6.1",
+    "swig>=4.3.1",
+]
