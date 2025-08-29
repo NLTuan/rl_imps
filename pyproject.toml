@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "rlgym"
 version = "0.1.0"
@@ -8,4 +12,52 @@ dependencies = [
     "gymnasium[box2d]>=1.2.0",
     "pygame>=2.6.1",
     "swig>=4.3.1",
+]
+
+[project.optional-dependencies]
+# Define install modes. Torch is not a core dependency, but part of an extra.
+cpu = [
+    "torch",
+    "torchvision",
+]
+gpu = [
+    "torch",
+    "torchvision",
+]
+
+
+# --- uv specific configuration ---
+
+[tool.uv]
+# Prevent installing cpu and gpu extras simultaneously.
+conflicts = [
+  [ { extra = "cpu" }, { extra = "gpu" } ],
+]
+
+# Define named package indexes.
+# `explicit = true` ensures uv only looks for the package in this index.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-gpu"
+url = "https://download.pytorch.org/whl/cu121" # Set your desired CUDA version
+explicit = true
+
+# Map packages to a specific index when a certain extra is being installed.
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-gpu", extra = "gpu" },
+]
+torchvision = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-gpu", extra = "gpu" },
+]
+
+[tool.uv.workspace]
+members = [
+    "rl_imps/rl_imps",
 ]
