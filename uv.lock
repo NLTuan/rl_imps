@@ -2,22 +2,16 @@ version = 1
 revision = 2
 requires-python = ">=3.12"
 resolution-markers = [
-    "extra != 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu'",
-    "(platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-5-rlgym-cpu' and extra != 'extra-5-rlgym-gpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-5-rlgym-cpu' and extra != 'extra-5-rlgym-gpu')",
-    "platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-5-rlgym-cpu' and extra != 'extra-5-rlgym-gpu'",
-    "sys_platform == 'darwin' and extra == 'extra-5-rlgym-cpu' and extra != 'extra-5-rlgym-gpu'",
-    "extra != 'extra-5-rlgym-cpu' and extra != 'extra-5-rlgym-gpu'",
+    "extra != 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu'",
+    "(platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-rl-imps-cpu' and extra != 'extra-7-rl-imps-gpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-rl-imps-cpu' and extra != 'extra-7-rl-imps-gpu')",
+    "platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-rl-imps-cpu' and extra != 'extra-7-rl-imps-gpu'",
+    "sys_platform == 'darwin' and extra == 'extra-7-rl-imps-cpu' and extra != 'extra-7-rl-imps-gpu'",
+    "extra != 'extra-7-rl-imps-cpu' and extra != 'extra-7-rl-imps-gpu'",
 ]
 conflicts = [[
-    { package = "rlgym", extra = "cpu" },
-    { package = "rlgym", extra = "gpu" },
+    { package = "rl-imps", extra = "cpu" },
+    { package = "rl-imps", extra = "gpu" },
 ]]
-
-[manifest]
-members = [
-    "rl-imps",
-    "rlgym",
-]
 
 [[package]]
 name = "box2d-py"
@@ -402,11 +396,6 @@ wheels = [
 [[package]]
 name = "rl-imps"
 version = "0.1.0"
-source = { virtual = "rl_imps/rl_imps" }
-
-[[package]]
-name = "rlgym"
-version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "gymnasium", extra = ["box2d"] },
@@ -416,10 +405,10 @@ dependencies = [
 
 [package.optional-dependencies]
 cpu = [
-    { name = "torch", version = "2.8.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-5-rlgym-cpu') or (extra == 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu')" },
-    { name = "torch", version = "2.8.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform != 'darwin' and extra == 'extra-5-rlgym-cpu') or (extra == 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu')" },
-    { name = "torchvision", version = "0.23.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-5-rlgym-cpu') or (platform_machine != 'aarch64' and extra == 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu') or (sys_platform == 'darwin' and extra == 'extra-5-rlgym-cpu') or (sys_platform != 'linux' and extra == 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu')" },
-    { name = "torchvision", version = "0.23.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-5-rlgym-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-5-rlgym-cpu') or (sys_platform == 'darwin' and extra == 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu') or (sys_platform == 'linux' and extra == 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu')" },
+    { name = "torch", version = "2.8.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-7-rl-imps-cpu') or (extra == 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu')" },
+    { name = "torch", version = "2.8.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform != 'darwin' and extra == 'extra-7-rl-imps-cpu') or (extra == 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu')" },
+    { name = "torchvision", version = "0.23.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-rl-imps-cpu') or (platform_machine != 'aarch64' and extra == 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu') or (sys_platform == 'darwin' and extra == 'extra-7-rl-imps-cpu') or (sys_platform != 'linux' and extra == 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu')" },
+    { name = "torchvision", version = "0.23.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-rl-imps-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-rl-imps-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu') or (sys_platform == 'linux' and extra == 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu')" },
 ]
 gpu = [
     { name = "torch", version = "2.5.1+cu121", source = { registry = "https://download.pytorch.org/whl/cu121" } },
@@ -431,10 +420,10 @@ requires-dist = [
     { name = "gymnasium", extras = ["box2d"], specifier = ">=1.2.0" },
     { name = "pygame", specifier = ">=2.6.1" },
     { name = "swig", specifier = ">=4.3.1" },
-    { name = "torch", marker = "extra == 'cpu'", index = "https://download.pytorch.org/whl/cpu", conflict = { package = "rlgym", extra = "cpu" } },
-    { name = "torch", marker = "extra == 'gpu'", index = "https://download.pytorch.org/whl/cu121", conflict = { package = "rlgym", extra = "gpu" } },
-    { name = "torchvision", marker = "extra == 'cpu'", index = "https://download.pytorch.org/whl/cpu", conflict = { package = "rlgym", extra = "cpu" } },
-    { name = "torchvision", marker = "extra == 'gpu'", index = "https://download.pytorch.org/whl/cu121", conflict = { package = "rlgym", extra = "gpu" } },
+    { name = "torch", marker = "extra == 'cpu'", index = "https://download.pytorch.org/whl/cpu", conflict = { package = "rl-imps", extra = "cpu" } },
+    { name = "torch", marker = "extra == 'gpu'", index = "https://download.pytorch.org/whl/cu121", conflict = { package = "rl-imps", extra = "gpu" } },
+    { name = "torchvision", marker = "extra == 'cpu'", index = "https://download.pytorch.org/whl/cpu", conflict = { package = "rl-imps", extra = "cpu" } },
+    { name = "torchvision", marker = "extra == 'gpu'", index = "https://download.pytorch.org/whl/cu121", conflict = { package = "rl-imps", extra = "gpu" } },
 ]
 provides-extras = ["cpu", "gpu"]
 
@@ -609,8 +598,8 @@ resolution-markers = [
 dependencies = [
     { name = "numpy", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or sys_platform == 'darwin'" },
     { name = "pillow", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or sys_platform == 'darwin'" },
-    { name = "torch", version = "2.8.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-5-rlgym-cpu') or (extra == 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu')" },
-    { name = "torch", version = "2.8.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-5-rlgym-cpu') or (platform_machine != 'aarch64' and extra == 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu') or (sys_platform != 'linux' and extra == 'extra-5-rlgym-cpu' and extra == 'extra-5-rlgym-gpu')" },
+    { name = "torch", version = "2.8.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-7-rl-imps-cpu') or (extra == 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu')" },
+    { name = "torch", version = "2.8.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-rl-imps-cpu') or (platform_machine != 'aarch64' and extra == 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu') or (sys_platform != 'linux' and extra == 'extra-7-rl-imps-cpu' and extra == 'extra-7-rl-imps-gpu')" },
 ]
 wheels = [
     { url = "https://download.pytorch.org/whl/cpu/torchvision-0.23.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e0e2c04a91403e8dd3af9756c6a024a1d9c0ed9c0d592a8314ded8f4fe30d440" },
