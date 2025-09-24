@@ -12,7 +12,7 @@ import random
 
 from collections import deque
 
-env = gym.make("CartPole-v1", render_mode="rgb_array")
+env = gym.make("LunarLander-v3", render_mode="rgb_array")
 
 h_size=128
 class DeepQNetwork(nn.Module):
@@ -52,7 +52,7 @@ min_replay_size = 1000
 start_e = 1
 end_e = 0
 
-gamma = 0.98
+gamma = 0.99
 tau = 0.001
 
 total_timesteps = 100000

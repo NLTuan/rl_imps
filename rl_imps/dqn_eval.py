@@ -38,7 +38,7 @@ class DeepQNetwork(nn.Module):
             return torch.argmax(self.forward(state), dim=-1).item()
 
 
-env = gym.make("CartPole-v1", render_mode="human")
+env = gym.make("LunarLander-v3", render_mode="human")
 
 q_network = DeepQNetwork()
 q_network.load_state_dict(torch.load("q_network128.pth"))
