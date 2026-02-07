@@ -103,4 +103,3 @@ for i in range(config.total_timesteps):
     
     print(f"Loss: {loss.item()}")
     
-print(f"Total reward: {total_reward}")
