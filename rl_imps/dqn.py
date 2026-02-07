@@ -3,8 +3,10 @@ import time
 
 import torch
 from torch import nn, optim
+import torch.nn.functional as F
 
 from collections import deque
+import random
 
 from dataclasses import dataclass
 
@@ -17,10 +19,10 @@ class DQNConfig:
     gamma: float
     
     hidden: int = 64
-    batch_size: int
-    total_timesteps: int
-    target_update: int
-    buffer_size: int
+    batch_size: int = 32
+    total_timesteps: int = 1000
+    target_update: int = 10
+    buffer_size: int = 1000
     
     
 class DeepQNetwork(nn.Module):
@@ -55,22 +57,50 @@ q_network = DeepQNetwork(env, hidden=config.hidden)
 target_network = DeepQNetwork(env, hidden=config.hidden)
 target_network.load_state_dict(q_network.state_dict())
 
+optimizer = optim.Adam(q_network.parameters(), lr=config.lr)
+
 replay_buffer = deque(maxlen=config.buffer_size)
 
 observation, info = env.reset()
 
 print(f"Starting observation: {observation}")
-
 over = False
-total_reward = 0
-while not over:
-    action = env.action_space.sample()
-    time.sleep(0.2)
+for i in range(config.total_timesteps):
+    # SAMPLING STEP    
+    # Epsilon-greedy action selection
+    if random.random() < config.epsilon:
+        action = env.action_space.sample()
+    else:
+        action = q_network(torch.tensor(observation, dtype=torch.float32)).argmax().item()
+    
+    # Perform step in the simulation
     observation, reward, terminated, truncated, info = env.step(action)
+    
+    # Store transition in replay buffer
+    replay_buffer.append((observation, action, reward, terminated or truncated))
+    
     if terminated or truncated:
-        break
-    print(f"Observation: {observation}")
-    total_reward += reward
+        observation, info = env.reset()
+    
+    # TRAINING STEP
+    batch = random.sample(replay_buffer, min(len(replay_buffer), config.batch_size)) 
+    
+    y = torch.zeros(len(batch))
+    
+    for i in range(len(batch)):
+        y[i] = batch[i][2] if batch[i][3] else  batch[i][2] + config.gamma * target_network(torch.tensor(batch[i][0], dtype=torch.float32)).max().item()
 
+    print(y.shape)
+    observations = torch.tensor([batch[i][0] for i in range(len(batch))], dtype=torch.float32)
+    loss = F.mse_loss(target_network(observations).max(dim=1).values, y)
+    
+    loss.backward()
+    optimizer.step()
+    optimizer.zero_grad()
+    
+    if i % config.target_update == 0:
+        target_network.load_state_dict(q_network.state_dict())
+    
+    print(f"Loss: {loss.item()}")
     
 print(f"Total reward: {total_reward}")
