@@ -1,5 +1,7 @@
 import gymnasium as gym
 import time
+import math
+from functools import partial
 
 import torch
 from torch import nn, optim
@@ -39,6 +41,13 @@ class DeepQNetwork(nn.Module):
         x = self.fc3(x)
         return x
 
+def cosine_sched(step, total_steps, start=1, end=0):
+    
+    scale_x = math.pi * total_steps ** -1
+    scale_y = (start - end) /2 
+    mid = (start + end) / 2
+    return math.cos(step * scale_x) * scale_y + mid
+
 
 config = DQNConfig(
     env_id='CartPole-v1',
@@ -50,6 +59,8 @@ config = DQNConfig(
     target_update=10,
     buffer_size=10000
 )
+
+sched = partial(cosine_sched, start=0.99, end=0.01, total_steps=config.total_timesteps)
 
 env = gym.make(config.env_id, render_mode='human')
 
@@ -68,16 +79,19 @@ over = False
 for i in range(config.total_timesteps):
     # SAMPLING STEP    
     # Epsilon-greedy action selection
-    if random.random() < config.epsilon:
+    if random.random() < sched(i):
         action = env.action_space.sample()
     else:
         action = q_network(torch.tensor(observation, dtype=torch.float32)).argmax().item()
     
+    
+    
+    prev_obs = observation
     # Perform step in the simulation
     observation, reward, terminated, truncated, info = env.step(action)
     
     # Store transition in replay buffer
-    replay_buffer.append((observation, action, reward, terminated or truncated))
+    replay_buffer.append((prev_obs, observation, action, reward, terminated or truncated))
     
     if terminated or truncated:
         observation, info = env.reset()
@@ -87,12 +101,15 @@ for i in range(config.total_timesteps):
     
     y = torch.zeros(len(batch))
     
-    for i in range(len(batch)):
-        y[i] = batch[i][2] if batch[i][3] else  batch[i][2] + config.gamma * target_network(torch.tensor(batch[i][0], dtype=torch.float32)).max().item()
+    for j in range(len(batch)):
+        y[j] = batch[j][3] if batch[j][4] else batch[j][3] + config.gamma * target_network(torch.tensor(batch[j][1], dtype=torch.float32)).max().item()
 
-    print(y.shape)
     observations = torch.tensor([batch[i][0] for i in range(len(batch))], dtype=torch.float32)
-    loss = F.mse_loss(target_network(observations).max(dim=1).values, y)
+    actions = torch.tensor([batch[i][2] for i in range(len(batch))], dtype=torch.long)
+    
+    q_values = torch.gather(q_network(observations), 1, actions.unsqueeze(1)).squeeze(1)
+    loss = F.mse_loss(q_values, y)
+    
     
     loss.backward()
     optimizer.step()
@@ -101,5 +118,7 @@ for i in range(config.total_timesteps):
     if i % config.target_update == 0:
         target_network.load_state_dict(q_network.state_dict())
     
+    print(i)
+    print(f"Epsilon: {sched(i)}")
     print(f"Loss: {loss.item()}")
     
