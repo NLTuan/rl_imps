@@ -71,10 +71,10 @@ while step_count < n_steps:
                     
             obs, reward, terminated, truncated, info = env.step(action.item())
             
-            # if truncated:
-            #     ep_rewards.append(100)
-            # else:
-            ep_rewards.append(reward)
+            if truncated:
+                ep_rewards.append(100)
+            else:
+                ep_rewards.append(reward)
 
             step_count += 1
             
