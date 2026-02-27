@@ -56,8 +56,8 @@ config = DQNConfig(
     gamma=0.99,
     batch_size=64,
     total_timesteps=10000,
-    target_update=10,
-    buffer_size=10000
+    target_update=100,
+    buffer_size=50000
 )
 
 sched = partial(cosine_sched, start=0.99, end=0.01, total_steps=config.total_timesteps)
