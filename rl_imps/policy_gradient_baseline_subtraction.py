@@ -7,24 +7,32 @@ from torch.distributions import Categorical
 
 import gymnasium as gym
 
-class PolicyGradientModel(nn.Module):
+class PolicyGradientModelWithBaseline():
     def __init__(self, obs_dim, act_dim, n_hidden=32):
-        super().__init__()
-        self.fc1 = nn.Linear(obs_dim, n_hidden)
-        self.fc2 = nn.Linear(n_hidden, n_hidden)
-        self.fc3 = nn.Linear(n_hidden, act_dim)
+        self.policy = nn.Sequential(
+            nn.Linear(obs_dim, n_hidden),
+            nn.ReLU(),
+            nn.Linear(n_hidden, n_hidden),
+            nn.ReLU(),
+            nn.Linear(n_hidden, act_dim)
+        )
         
-    def forward(self, x):
-        h1 = F.relu(self.fc1(x))
-        h2 = F.relu(self.fc2(h1))
-        return self.fc3(h2)
+        self.baseline = nn.Sequential(
+            nn.Linear(obs_dim, n_hidden),
+            nn.ReLU(),
+            nn.Linear(n_hidden, n_hidden),
+            nn.ReLU(),
+            nn.Linear(n_hidden, 1)
+        )
         
 
 env = gym.make('CartPole-v1', render_mode="rgb_array")
 
 obs_dim = env.observation_space.shape[0]
 act_dim = env.action_space.n
-policy = PolicyGradientModel(obs_dim, act_dim)
+policy_with_baseline = PolicyGradientModelWithBaseline(obs_dim, act_dim)
+policy = policy_with_baseline.policy
+baseline = policy_with_baseline.baseline
 
 obs, info = env.reset()
 
@@ -37,7 +45,9 @@ step_count = 0
 n_eps_per_batch = 8
 
 lr = 6e-4
+lr_baseline = 6e-4
 opt = optim.AdamW(policy.parameters(), lr=lr)
+opt_baseline = optim.AdamW(baseline.parameters(), lr=lr_baseline)
 while step_count < n_steps:
 
     if step_count >= 295000:
@@ -46,6 +56,7 @@ while step_count < n_steps:
     
     act_log_probs = []
     total_cum_rewards = []
+    observations = []
     
     eps_lens = []
     for i in range(n_eps_per_batch):
@@ -57,6 +68,7 @@ while step_count < n_steps:
             action_dist = Categorical(logits = policy(tensor(obs)))
             action = action_dist.sample()
             act_log_probs.append(action_dist.log_prob(action))
+            observations.append(obs)
                     
             obs, reward, terminated, truncated, info = env.step(action.item())
             
@@ -81,15 +93,25 @@ while step_count < n_steps:
         obs, info = env.reset()
 
     
+    
     act_log_probs = torch.stack(act_log_probs)
     total_cum_rewards = torch.tensor(total_cum_rewards, dtype=torch.float32)
     
-    total_cum_rewards = (total_cum_rewards - total_cum_rewards.mean()) / (total_cum_rewards.std() + 1e-8)
-    loss = -(act_log_probs * total_cum_rewards).mean()
+    baseline_values = baseline(torch.tensor(observations, dtype=torch.float32)).squeeze()
     
+    total_cum_rewards = (total_cum_rewards - total_cum_rewards.mean()) / (total_cum_rewards.std() + 1e-8)
+    loss = -(act_log_probs * (total_cum_rewards - baseline_values.detach())).mean()
+    
+    loss_baseline = F.mse_loss(baseline_values, total_cum_rewards)
+    # import pdb; pdb.set_trace()
+
     loss.backward()
     opt.step()
     opt.zero_grad()
+    
+    loss_baseline.backward()
+    opt_baseline.step()
+    opt_baseline.zero_grad()
     # import pdb; pdb.set_trace()
     print(loss, end=" ")
     print(torch.tensor(eps_lens, dtype=torch.float32).mean(), end=' ')
