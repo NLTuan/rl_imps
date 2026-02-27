@@ -53,6 +53,11 @@ opt_baseline = optim.AdamW(baseline.parameters(), lr=lr_baseline)
 viz = False
 while step_count < n_steps:
     
+    if step_count >= 95000 and not viz:
+                env = gym.make(env_name, render_mode="human")
+                obs, info = env.reset()
+                viz = True
+                
     act_log_probs = []
     total_cum_rewards = []
     observations = []
@@ -78,10 +83,7 @@ while step_count < n_steps:
 
             step_count += 1
             
-            if step_count >= 95000 and not viz:
-                env = gym.make(env_name, render_mode="human")
-                obs, info = env.reset()
-                viz = True
+            
         
         eps_lens.append(step_count - step_before)
         
